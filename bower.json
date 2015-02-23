@@ -23,5 +23,6 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "main": "dist/angularJsOAuth2.js"
 }
