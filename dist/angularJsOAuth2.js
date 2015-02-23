@@ -164,7 +164,7 @@ angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http
 			responseType: '@',  			// defaults to token
 			scope: '@',						// scopes required (not the Angular scope - the auth server scopes)
 			state: '@',						// state to use for CSRF protection
-			template: '@',					// template for the button, defaults to the one supplied by bower
+			template: '@',					// path to a replace template for the button, defaults to the one supplied by bower
 			buttonClass: '@',				// the class to use for the sign in / out button - defaults to btn btn-primary
 			signInText: '@',				// text for the sign in button
 			signOutText: '@',				// text for the sign out button
@@ -176,10 +176,16 @@ angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http
 
 	definition.link = function(scope, element, attrs) {
 		function compile() {
-	      $http.get(scope.template, { cache: $templateCache }).success(function(html) {
-	        element.html(html);
-	        $compile(element.contents())(scope);
-	      });
+			var tpl = '<p class="navbar-btn"><a class="{{buttonClass}}"><span href="#" ng-hide="signedIn" ng-click="signIn()" >{{signInText}}</span><span href="#" ng-show="signedIn" ng-click="signOut()">{{signOutText}}</span></a></p>';
+			if (scope.template) {
+				$http.get(scope.template, { cache: $templateCache }).success(function(html) {
+		        element.html(html);
+		        $compile(element.contents())(scope);
+		      });
+			} else {
+				element.html(tpl);
+				$compile(element.contents())(scope);
+			}
 	    };
 
 	    function routeChangeHandler(event, nextRoute) {
@@ -192,7 +198,6 @@ angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http
 	    };
 
 		function init() {
-			scope.template = scope.template || 'bower_components/af-oauth2-ng/dist/views/templates/signinoutbutton.html';
 			scope.buttonClass = scope.buttonClass || 'btn btn-primary';
 			scope.signInText = scope.signInText || 'Sign In';
 			scope.signOutText = scope.signOutText || 'Sign Out';
