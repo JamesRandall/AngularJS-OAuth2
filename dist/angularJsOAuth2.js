@@ -119,20 +119,28 @@ angular.module('oauth2.interceptor', []).factory('OAuth2Interceptor', ['$rootSco
   		response: function(response) {
   			var token = $sessionStorage.token;
   			if (response.status === 401) {
-  				$rootScope.$broadcast('oauth2:unauthorized', token);
+  				if (expired(token)) {
+  					$rootScope.$broadcast('oauth2:authExpired', token);
+  				} else {
+  					$rootScope.$broadcast('oauth2:unauthorized', token);
+  				}
   			}
   			else if (response.status === 500) {
-  				$rootScope.$broadcast('oauth2:internalservererror', token);
+  				$rootScope.$broadcast('oauth2:internalservererror');
   			}
   			return response;
   		},
   		responseError: function(response) {
   			var token = $sessionStorage.token;
-  			if (response.status === 401) {
-  				$rootScope.$broadcast('oauth2:unauthorized', token);
+  			f (response.status === 401) {
+  				if (expired(token)) {
+  					$rootScope.$broadcast('oauth2:authExpired', token);
+  				} else {
+  					$rootScope.$broadcast('oauth2:unauthorized', token);
+  				}
   			}
   			else if (response.status === 500) {
-  				$rootScope.$broadcast('oauth2:internalservererror', token);
+  				$rootScope.$broadcast('oauth2:internalservererror');
   			}
   			return response;
   		}
@@ -241,6 +249,9 @@ angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http
 				if (scope.unauthorizedAccessUrl.length > 0) {
 					$location.path(scope.unauthorizedAccessUrl);
 				}
+			});
+			scope.$on('oauth2:authExpired', function() {
+				scope.signedIn = false;
 			});
 			$rootScope.$on('$routeChangeStart', routeChangeHandler);
 		}
