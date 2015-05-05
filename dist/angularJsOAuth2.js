@@ -77,11 +77,15 @@ angular.module('oauth2.accessToken', ['ngStorage']).factory('AccessToken', ['$ro
 			$rootScope.$broadcast('oauth2:authError', error);
 		}
 
-		if (service.token !== null && $sessionStorage.oauthRedirectRoute) {
-			var path = $sessionStorage.oauthRedirectRoute;
-			$sessionStorage.oauthRedirectRoute = null;
-			$location.path(path);
+		if (service.token !== null) {
+			$rootScope.$broadcast('oauth2:authSuccess');
+			if ($sessionStorage.oauthRedirectRoute) {
+				var path = $sessionStorage.oauthRedirectRoute;
+				$sessionStorage.oauthRedirectRoute = null;
+				$location.path(path);
+			}
 		}
+		
 
 		return service.token;
 	};
