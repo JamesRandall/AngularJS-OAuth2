@@ -117,6 +117,7 @@ angular.module('oauth2.interceptor', []).factory('OAuth2Interceptor', ['$rootSco
     		return config;
   		},
   		response: function(response) {
+  			var token = $sessionStorage.token;
   			if (response.status === 401) {
   				$rootScope.$broadcast('oauth2:unauthorized', token);
   			}
@@ -126,6 +127,7 @@ angular.module('oauth2.interceptor', []).factory('OAuth2Interceptor', ['$rootSco
   			return response;
   		},
   		responseError: function(response) {
+  			var token = $sessionStorage.token;
   			if (response.status === 401) {
   				$rootScope.$broadcast('oauth2:unauthorized', token);
   			}
