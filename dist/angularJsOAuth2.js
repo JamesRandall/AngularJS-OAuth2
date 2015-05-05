@@ -115,6 +115,24 @@ angular.module('oauth2.interceptor', []).factory('OAuth2Interceptor', ['$rootSco
                 return config;
 			}
     		return config;
+  		},
+  		response: function(response) {
+  			if (response.status === 401) {
+  				$rootScope.$broadcast('oauth2:unauthorized', token);
+  			}
+  			else if (response.status === 500) {
+  				$rootScope.$broadcast('oauth2:internalservererror', token);
+  			}
+  			return response;
+  		},
+  		responseError: function(response) {
+  			if (response.status === 401) {
+  				$rootScope.$broadcast('oauth2:unauthorized', token);
+  			}
+  			else if (response.status === 500) {
+  				$rootScope.$broadcast('oauth2:internalservererror', token);
+  			}
+  			return response;
   		}
 	};
   	return service;
