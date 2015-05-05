@@ -132,7 +132,7 @@ angular.module('oauth2.interceptor', []).factory('OAuth2Interceptor', ['$rootSco
   		},
   		responseError: function(response) {
   			var token = $sessionStorage.token;
-  			f (response.status === 401) {
+  			if (response.status === 401) {
   				if (expired(token)) {
   					$rootScope.$broadcast('oauth2:authExpired', token);
   				} else {
