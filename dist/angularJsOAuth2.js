@@ -223,6 +223,7 @@ angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http
 	    function routeChangeHandler(event, nextRoute) {
 	    	if (nextRoute.$$route && nextRoute.$$route.requireToken) {
                 if (!accessToken.get()) {
+                	event.preventDefault();
                 	$sessionStorage.oauthRedirectRoute = nextRoute.$$route.originalPath;
                     endpoint.authorize();
                 }
