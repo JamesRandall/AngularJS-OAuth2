@@ -185,7 +185,7 @@ angular.module('oauth2.endpoint', []).factory('Endpoint', ['AccessToken', functi
 }]);
 
 // Open ID directive
-angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http', '$templateCache', '$compile', '$sessionStorage', 'AccessToken', 'Endpoint', function($rootScope, $http,$templateCache, $compile, $sessionStorage, accessToken, endpoint) {
+angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http', '$window', '$templateCache', '$compile', '$sessionStorage', 'AccessToken', 'Endpoint', function($rootScope, $http, $window, $templateCache, $compile, $sessionStorage, accessToken, endpoint) {
 	var definition = {
 	    restrict: 'E',
 	    replace: true,
