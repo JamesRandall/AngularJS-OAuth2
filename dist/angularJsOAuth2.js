@@ -8,7 +8,7 @@
 //var scope = "extracurricular";
 //var state = Date.now() + "" + Math.random();
 
-angular.module('oauth2.accessToken', ['ngStorage']).factory('AccessToken', ['$rootScope', '$location', '$sessionStorage', function($rootScope, $location, $sessionStorage) {
+angular.module('oauth2.accessToken', ['ngStorage']).factory('AccessToken', ['$rootScope', '$location', '$window', '$sessionStorage', function($rootScope, $location, $window, $sessionStorage) {
 	var service = {
 		token: null
 	};
@@ -82,7 +82,7 @@ angular.module('oauth2.accessToken', ['ngStorage']).factory('AccessToken', ['$ro
 			if ($sessionStorage.oauthRedirectRoute) {
 				var path = $sessionStorage.oauthRedirectRoute;
 				$sessionStorage.oauthRedirectRoute = null;
-				$location.path(path);
+				$window.location.href = path;
 			}
 		}
 		
@@ -224,7 +224,7 @@ angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http
 	    	if (nextRoute.$$route && nextRoute.$$route.requireToken) {
                 if (!accessToken.get()) {
                 	event.preventDefault();
-                	$sessionStorage.oauthRedirectRoute = nextRoute.$$route.originalPath;
+                	$sessionStorage.oauthRedirectRoute = $window.location.href;
                     endpoint.authorize();
                 }
             }
