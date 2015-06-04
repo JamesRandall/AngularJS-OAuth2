@@ -82,7 +82,7 @@ angular.module('oauth2.accessToken', ['ngStorage']).factory('AccessToken', ['$ro
 			if ($sessionStorage.oauthRedirectRoute) {
 				var path = $sessionStorage.oauthRedirectRoute;
 				$sessionStorage.oauthRedirectRoute = null;
-				$window.location.href = path;
+				$location.path(path);
 			}
 		}
 		
@@ -185,7 +185,7 @@ angular.module('oauth2.endpoint', []).factory('Endpoint', ['AccessToken', functi
 }]);
 
 // Open ID directive
-angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http', '$window', '$templateCache', '$compile', '$sessionStorage', 'AccessToken', 'Endpoint', function($rootScope, $http, $window, $templateCache, $compile, $sessionStorage, accessToken, endpoint) {
+angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http', '$window', '$location', '$templateCache', '$compile', '$sessionStorage', 'AccessToken', 'Endpoint', function($rootScope, $http, $window, $location, $templateCache, $compile, $sessionStorage, accessToken, endpoint) {
 	var definition = {
 	    restrict: 'E',
 	    replace: true,
@@ -224,7 +224,7 @@ angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http
 	    	if (nextRoute.$$route && nextRoute.$$route.requireToken) {
                 if (!accessToken.get()) {
                 	event.preventDefault();
-                	$sessionStorage.oauthRedirectRoute = $window.location.href;
+                	$sessionStorage.oauthRedirectRoute = $location.path();
                     endpoint.authorize();
                 }
             }
