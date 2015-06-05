@@ -173,6 +173,11 @@ angular.module('oauth2.endpoint', []).factory('Endpoint', ['AccessToken', functi
 				  	  'scope=' + encodeURI(params.scope) + '&' +
 				  	  'state=' + encodeURI(params.state);
 		service.signOutUrl = params.signOutUrl;
+		
+		if (params.signInAppendNonce == 'true') {
+			service.url = service.url + '&nonce=' + service.generateNonce(params.signInNonceLength);
+		}
+		
 		if (params.signOutAppendToken == 'true') {
 			service.appendSignoutToken = true;
 		}
@@ -180,6 +185,15 @@ angular.module('oauth2.endpoint', []).factory('Endpoint', ['AccessToken', functi
 			service.signOutUrl = service.signOutUrl+ '?post_logout_redirect_uri=' + encodeURI(params.signOutRedirectUrl);
 		}
 	};
+	
+	service.generateNonce = function(length) {
+	    var text = "";
+	    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	    for(var i = 0; i < length; i++) {
+	        text += possible.charAt(Math.floor(Math.random() * possible.length));
+	    }
+	    return text;
+	}
 
 	return service;
 }]);
@@ -202,7 +216,9 @@ angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http
 			signOutText: '@',				// text for the sign out button
 			signOutUrl: '@',				// url on the authorization server for logging out. Local token is deleted even if no URL is given but that will leave user logged in against STS
 			signOutAppendToken: '@',		// defaults to 'false', set to 'true' to append the token to the sign out url
-			signOutRedirectUrl: '@'			// url to redirect to after sign out on the STS has completed
+			signOutRedirectUrl: '@',		// url to redirect to after sign out on the STS has completed
+			signInAppendNonce: '@',			// whether to append a nonce or not
+			signInNonceLength: '@'			// the length of the nonce (only used if signInAppendNonce is set - defaults to 8 chars if not set)
 	    }
 	};
 
@@ -238,6 +254,14 @@ angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http
 			scope.signOutUrl = scope.signOutUrl || '';
 			scope.signOutRedirectUrl = scope.signOutRedirectUrl || '';
 			scope.unauthorizedAccessUrl = scope.unauthorizedAccessUrl || '';
+			scope.signInAppendNonce = scope.signInAppendNonce || '';
+			
+			if (scope.signInNonceLength !== '' && !isNaN(scope.signInNonceLength)) {
+			    scope.signInNonceLength = scope.signInNonceLength;
+			}
+			else {
+				scope.signInNonceLength = 8;
+			}
 
 			compile();
 
