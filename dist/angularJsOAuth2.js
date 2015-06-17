@@ -12,7 +12,7 @@ angular.module('oauth2.accessToken', ['ngStorage']).factory('AccessToken', ['$ro
 	var service = {
 		token: null
 	};
-	var oAuth2HashParams = ['access_token', 'token_type', 'expires_in', 'scope', 'state', 'error', 'error_description'];
+	var oAuth2HashParams = ['id_token', 'access_token', 'token_type', 'expires_in', 'scope', 'state', 'error', 'error_description'];
 	
 	function setExpiresAt(token) {
 		if(token){
@@ -55,6 +55,10 @@ angular.module('oauth2.accessToken', ['ngStorage']).factory('AccessToken', ['$ro
 		return this.token;
 	};
 	service.set = function() {
+		// Get and scrub the session stored state
+		var previousState = $sessionStorage.verifyState;
+		$sessionStorage.verifyState = null;
+
 		// Try and get the token from the hash params on the URL
 		var hashValues = window.location.hash;
 		if (hashValues.length > 0) {
@@ -78,11 +82,17 @@ angular.module('oauth2.accessToken', ['ngStorage']).factory('AccessToken', ['$ro
 		}
 
 		if (service.token !== null) {
-			$rootScope.$broadcast('oauth2:authSuccess');
-			if ($sessionStorage.oauthRedirectRoute) {
-				var path = $sessionStorage.oauthRedirectRoute;
-				$sessionStorage.oauthRedirectRoute = null;
-				$location.path(path);
+			if (previousState == service.token.state) {
+				$rootScope.$broadcast('oauth2:authSuccess');
+				if ($sessionStorage.oauthRedirectRoute) {
+					var path = $sessionStorage.oauthRedirectRoute;
+					$sessionStorage.oauthRedirectRoute = null;
+					$location.path(path);
+				}
+			}
+			else {
+				service.destroy();
+				$rootScope.$broadcast('oauth2:authError', 'Suspicious callback');
 			}
 		}
 		
@@ -149,9 +159,12 @@ angular.module('oauth2.interceptor', []).factory('OAuth2Interceptor', ['$rootSco
 }]);
 
 // Endpoint wrapper
-angular.module('oauth2.endpoint', []).factory('Endpoint', ['AccessToken', function(accessToken) {
+angular.module('oauth2.endpoint', []).factory('Endpoint', ['AccessToken', '$sessionStorage', function(accessToken, $sessionStorage) {
 	var service = {
-		authorize: function() { window.location.replace(service.url); },
+		authorize: function() {
+			$sessionStorage.verifyState = service.state;
+			window.location.replace(service.url);
+		},
 		appendSignoutToken: false
 	};
 
@@ -159,7 +172,11 @@ angular.module('oauth2.endpoint', []).factory('Endpoint', ['AccessToken', functi
 		if (service.signOutUrl && service.signOutUrl.length > 0) {
 			var url = service.signOutUrl;
 			if (service.appendSignoutToken) {
-				url = url + token;
+				url = url + '?id_token_hint=' + token;
+			}
+			if (service.signOutRedirectUrl && service.signOutRedirectUrl.length > 0) {
+				url = url + (service.appendSignoutToken ? '&' : '?');
+				url = url + 'post_logout_redirect_uri=' + encodeURIComponent(service.signOutRedirectUrl);
 			}
 			window.location.replace(url);
 		}
@@ -171,13 +188,13 @@ angular.module('oauth2.endpoint', []).factory('Endpoint', ['AccessToken', functi
 				  	  'redirect_uri=' + encodeURI(params.redirectUrl) + '&' +
 				  	  'response_type=' + encodeURI(params.responseType) + '&' +
 				  	  'scope=' + encodeURI(params.scope) + '&' +
+				  	  'nonce=' + encodeURI(params.nonce) + '&' +
 				  	  'state=' + encodeURI(params.state);
 		service.signOutUrl = params.signOutUrl;
+		service.signOutRedirectUrl = params.signOutRedirectUrl;
+		service.state = params.state;
 		if (params.signOutAppendToken == 'true') {
 			service.appendSignoutToken = true;
-		}
-		if (params.signOutRedirectUrl.length > 0) {
-			service.signOutUrl = service.signOutUrl+ '?post_logout_redirect_uri=' + encodeURI(params.signOutRedirectUrl);
 		}
 	};
 
@@ -185,7 +202,7 @@ angular.module('oauth2.endpoint', []).factory('Endpoint', ['AccessToken', functi
 }]);
 
 // Open ID directive
-angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http', '$window', '$location', '$templateCache', '$compile', '$sessionStorage', 'AccessToken', 'Endpoint', function($rootScope, $http, $window, $location, $templateCache, $compile, $sessionStorage, accessToken, endpoint) {
+angular.module('oauth2.directive', ['angular-md5']).directive('oauth2', ['$rootScope', '$http', '$window', '$location', '$templateCache', '$compile', '$sessionStorage', 'AccessToken', 'Endpoint', 'md5', function($rootScope, $http, $window, $location, $templateCache, $compile, $sessionStorage, accessToken, endpoint, md5) {
 	var definition = {
 	    restrict: 'E',
 	    replace: true,
@@ -202,7 +219,8 @@ angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http
 			signOutText: '@',				// text for the sign out button
 			signOutUrl: '@',				// url on the authorization server for logging out. Local token is deleted even if no URL is given but that will leave user logged in against STS
 			signOutAppendToken: '@',		// defaults to 'false', set to 'true' to append the token to the sign out url
-			signOutRedirectUrl: '@'			// url to redirect to after sign out on the STS has completed
+			signOutRedirectUrl: '@',		// url to redirect to after sign out on the STS has completed
+			nonce: '@'						// nonce value, optional
 	    }
 	};
 
@@ -230,6 +248,15 @@ angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http
             }
 	    };
 
+	    function generateNonce(length) {
+	    	var text = "";
+		    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		    for(var i = 0; i < length; i++) {
+		        text += possible.charAt(Math.floor(Math.random() * possible.length));
+		    }
+		    return md5.createHash(text);
+	    };
+
 		function init() {
 			scope.buttonClass = scope.buttonClass || 'btn btn-primary';
 			scope.signInText = scope.signInText || 'Sign In';
@@ -238,6 +265,8 @@ angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http
 			scope.signOutUrl = scope.signOutUrl || '';
 			scope.signOutRedirectUrl = scope.signOutRedirectUrl || '';
 			scope.unauthorizedAccessUrl = scope.unauthorizedAccessUrl || '';
+			scope.state = scope.state || generateNonce(32);
+			scope.nonce = scope.nonce || generateNonce(32);
 
 			compile();
 
@@ -266,7 +295,7 @@ angular.module('oauth2.directive', []).directive('oauth2', ['$rootScope', '$http
 		}
 
 		scope.signOut = function() {
-			var token = accessToken.get().access_token;
+			var token = accessToken.get().id_token;
 			accessToken.destroy();
 			endpoint.signOut(token);
 		};
