@@ -248,14 +248,10 @@ angular.module('oauth2.directive', ['angular-md5']).directive('oauth2', ['$rootS
             }
 	    };
 
-	    function generateNonce(length) {
-	    	var text = "";
-		    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-		    for(var i = 0; i < length; i++) {
-		        text += possible.charAt(Math.floor(Math.random() * possible.length));
-		    }
-		    return md5.createHash(text);
-	    };
+	    function generateState() {
+			var text = ((Date.now() + Math.random()) * Math.random()).toString().replace(".","");
+			return md5.createHash(text);
+		}
 
 		function init() {
 			scope.buttonClass = scope.buttonClass || 'btn btn-primary';
@@ -265,8 +261,8 @@ angular.module('oauth2.directive', ['angular-md5']).directive('oauth2', ['$rootS
 			scope.signOutUrl = scope.signOutUrl || '';
 			scope.signOutRedirectUrl = scope.signOutRedirectUrl || '';
 			scope.unauthorizedAccessUrl = scope.unauthorizedAccessUrl || '';
-			scope.state = scope.state || generateNonce(32);
-			scope.nonce = scope.nonce || generateNonce(32);
+			scope.state = scope.state || generateState();
+			scope.nonce = scope.nonce || generateState();
 
 			compile();
 
