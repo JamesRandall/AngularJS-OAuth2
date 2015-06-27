@@ -1,6 +1,6 @@
 {
   "name": "AngularJS-OAuth2",
-  "version": "0.9.9",
+  "version": "0.9.10",
   "homepage": "https://github.com/JamesRandall/AngularJS-OAuth2",
   "authors": [
     "James Randall"
@@ -25,8 +25,7 @@
     "tests"
   ],
   "dependencies": {
-    "angular-md5": ">=0.1.7",
-    "ngstorage": ">=0.3.0"
+    "angular-md5": ">=0.1.7"
   },
   "main": "dist/angularJsOAuth2.js"
 }
