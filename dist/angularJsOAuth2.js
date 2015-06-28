@@ -70,15 +70,25 @@
 			var previousState = $window.sessionStorage.getItem('verifyState');
 			$window.sessionStorage.setItem('verifyState', null);
 
-			// Try and get the token from the hash params on the URL
-			var hashValues = window.location.hash;
-			if (hashValues.length > 0) {
-				if (hashValues.indexOf('#/') == 0) {
-					hashValues = hashValues.substring(2);
+			if ($location.$$html5) {
+				if ($location.path().length > 1) {
+					var values = $location.path().substring(1);
+					service.token = setTokenFromHashParams(values);
+					if (service.token) {
+						parsedFromHash = true;
+					}
 				}
-				service.token = setTokenFromHashParams(hashValues);
-				if (service.token) {
-					parsedFromHash = true;
+			} else {
+				// Try and get the token from the hash params on the URL
+				var hashValues = window.location.hash;
+				if (hashValues.length > 0) {
+					if (hashValues.indexOf('#/') == 0) {
+						hashValues = hashValues.substring(2);
+					}
+					service.token = setTokenFromHashParams(hashValues);
+					if (service.token) {
+						parsedFromHash = true;
+					}
 				}
 			}
 			
@@ -300,6 +310,7 @@
 			scope.signedIn = false;
 
 			scope.signIn = function() {
+				$window.sessionStorage.setItem('oauthRedirectRoute', $location.path());
 				endpoint.authorize();
 			}
 
