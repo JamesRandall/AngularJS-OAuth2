@@ -1,0 +1,42 @@
+{
+  "name": "AngularJS-OAuth2",
+  "version": "1.0.0",
+  "description": "Bower package for allowing an AngularJS application to authenticate with an OAuth 2 / Open ID Connect identity provider using the implicit flow.",
+  "main": "dist/angularJsOAuth2.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JamesRandall/AngularJS-OAuth2.git"
+  },
+  "keywords": [
+    "angularjs",
+    "oauth2",
+    "identity",
+    "openid",
+    "openidconnect",
+    "directive",
+    "authentication",
+    "authorization"
+  ],
+  "author": "James Randall",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JamesRandall/AngularJS-OAuth2/issues"
+  },
+  "homepage": "https://github.com/JamesRandall/AngularJS-OAuth2",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    
+    "karma-script-launcher": "^0.1.0",
+    "karma-chrome-launcher": "^0.2.0",
+    "karma-jasmine": "^0.3.5",
+    "karma-phantomjs-launcher": "^0.2.0",
+    "karma": "^0.12.37",
+    "karma-story-reporter": "^0.3.1",
+    "grunt-karma": "^0.11.1",
+    "grunt-cli": "^0.1.13",
+    "karma-sauce-launcher": "~0.1.8"
+  }
+}
