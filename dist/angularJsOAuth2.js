@@ -71,7 +71,14 @@
 			$window.sessionStorage.setItem('verifyState', null);
 
 			if ($location.$$html5) {
-				if ($location.path().length > 1) {
+				var hashValues = $location.hash();
+				if (hashValues.length > 0) {
+					service.token = setTokenFromHashParams(hashValues);
+					if (service.token) {
+						parsedFromHash = true;
+					}
+				}
+				else if ($location.path().length > 1) {
 					var values = $location.path().substring(1);
 					service.token = setTokenFromHashParams(values);
 					if (service.token) {
