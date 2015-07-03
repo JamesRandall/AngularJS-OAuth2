@@ -278,6 +278,16 @@
 	            }
 		    };
 
+			function stateChangeHandler(event, nextRoute) {
+				if (nextRoute && nextRoute.requireToken) {
+					if (!accessToken.get()) {
+						event.preventDefault();
+						$window.sessionStorage.setItem('oauthRedirectRoute', $location.path());
+						endpoint.authorize();
+					}
+				}
+			};
+
 		    function generateState() {
 				var text = ((Date.now() + Math.random()) * Math.random()).toString().replace(".","");
 				return md5.createHash(text);
@@ -310,6 +320,7 @@
 					scope.signedIn = false;
 				});
 				$rootScope.$on('$routeChangeStart', routeChangeHandler);
+				$rootScope.$on('$stateChangeStart', stateChangeHandler);
 			}
 
 			scope.$watch('clientId', function(value) { init(); });
