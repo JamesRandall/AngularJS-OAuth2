@@ -232,7 +232,7 @@
 	}]);
 
 	// Open ID directive
-	angular.module('oauth2.directive', ['angular-md5']).directive('oauth2', ['$rootScope', '$http', '$window', '$location', '$templateCache', '$compile', 'AccessToken', 'Endpoint', 'md5', function($rootScope, $http, $window, $location, $templateCache, $compile, accessToken, endpoint, md5) {
+	angular.module('oauth2.directive', ['angular-md5']).directive('oauth2', ['$injector', '$rootScope', '$http', '$window', '$location', '$templateCache', '$compile', 'AccessToken', 'Endpoint', 'md5', function($injector, $rootScope, $http, $window, $location, $templateCache, $compile, accessToken, endpoint, md5) {
 		var definition = {
 		    restrict: 'E',
 		    replace: true,
@@ -278,11 +278,12 @@
 	            }
 		    };
 
-			function stateChangeHandler(event, nextRoute) {
-				if (nextRoute && nextRoute.requireToken) {
+			function stateChangeHandler(event, toState, toParams, fromState, fromParams) {
+				if (toState && toState.requireToken) {
 					if (!accessToken.get()) {
-						event.preventDefault();
-						$window.sessionStorage.setItem('oauthRedirectRoute', $location.path());
+						var $state = $injector.get('$state');
+						var locationPath = $state.href(toState, toParams, {absolute: false});
+						$window.sessionStorage.setItem('oauthRedirectRoute', locationPath);
 						endpoint.authorize();
 					}
 				}
