@@ -207,12 +207,12 @@
 		
 		service.init = function(params) {
 			service.url = params.authorizationUrl + '?' +
-					  	  'client_id=' + encodeURI(params.clientId) + '&' +
-					  	  'redirect_uri=' + encodeURI(params.redirectUrl) + '&' +
-					  	  'response_type=' + encodeURI(params.responseType) + '&' +
-					  	  'scope=' + encodeURI(params.scope) + '&' +
-					  	  'nonce=' + encodeURI(params.nonce) + '&' +
-					  	  'state=' + encodeURI(params.state);
+					  	  'client_id=' + encodeURIComponent(params.clientId) + '&' +
+					  	  'redirect_uri=' + encodeURIComponent(params.redirectUrl) + '&' +
+					  	  'response_type=' + encodeURIComponent(params.responseType) + '&' +
+					  	  'scope=' + encodeURIComponent(params.scope) + '&' +
+					  	  'nonce=' + encodeURIComponent(params.nonce) + '&' +
+					  	  'state=' + encodeURIComponent(params.state);
 			service.signOutUrl = params.signOutUrl;
 			service.signOutRedirectUrl = params.signOutRedirectUrl;
 			service.state = params.state;
