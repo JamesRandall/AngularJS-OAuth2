@@ -9,6 +9,9 @@
 //var state = Date.now() + "" + Math.random();
 
 (function() {
+	function expired(token) {
+		return (token && token.expires_at && new Date(token.expires_at) < new Date());
+	};
 	function getSessionToken($window) {
 		var tokenString = $window.sessionStorage.getItem('token');
 		var token = null;
@@ -133,9 +136,6 @@
 
 	// Auth interceptor - if token is missing or has expired this broadcasts an authRequired event
 	angular.module('oauth2.interceptor', []).factory('OAuth2Interceptor', ['$rootScope', '$q', '$window',  function ($rootScope, $q, $window) {
-		var expired = function(token) {
-	    	return (token && token.expires_at && new Date(token.expires_at) < new Date());
-	  	};
 		
 		var service = {
 			request: function(config) {
@@ -185,6 +185,7 @@
 	angular.module('oauth2.endpoint', []).factory('Endpoint', ['AccessToken', '$window', function(accessToken, $window) {
 		var service = {
 			authorize: function() {
+				accessToken.destroy();
 				$window.sessionStorage.setItem('verifyState', service.state);
 				window.location.replace(service.url);
 			},
@@ -266,7 +267,7 @@
 
 		    function routeChangeHandler(event, nextRoute) {
 		    	if (nextRoute.$$route && nextRoute.$$route.requireToken) {
-	                if (!accessToken.get()) {
+	                if (!accessToken.get() || expired(accessToken.get())) {
 	                	event.preventDefault();
 	                	$window.sessionStorage.setItem('oauthRedirectRoute', $location.path());
 	                    endpoint.authorize();
@@ -309,6 +310,7 @@
 				});
 				scope.$on('oauth2:authExpired', function() {
 					scope.signedIn = false;
+					accessToken.destroy();
 				});
 				$rootScope.$on('$routeChangeStart', routeChangeHandler);
 			}
