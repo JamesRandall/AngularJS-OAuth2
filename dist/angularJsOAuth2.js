@@ -175,7 +175,7 @@
 	  			else if (response.status === 500) {
 	  				$rootScope.$broadcast('oauth2:internalservererror');
 	  			}
-	  			return response;
+	  			return $q.reject(response);
 	  		}
 		};
 	  	return service;
