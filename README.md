@@ -2,12 +2,13 @@
 
 This is an Angular directive and HTTP interceptor available as a Bower package for adding OAuth 2 authentication support to AngularJS. In addition to this documentation a couple of samples and tutorials are available:
 
-[Authenticating AngularJS Against OAuth 2.0 / OpenID Connect](http://www.azurefromthetrenches.com/authenticating-angularjs-against-oauth-2-0-openid-connect/)
-[Sample of IdentityServer3 and AngularJS-OAuth2](https://github.com/JamesRandall/AngularJS-OAuth2-IdentityServer3-Sample)
+[Authenticating AngularJS Against OAuth 2.0 / OpenID Using Google Connect](http://www.azurefromthetrenches.com/authenticating-angularjs-against-oauth-2-0-openid-connect/)
+
+[Using AngularJS-OAuth2 with an instance of IdentityServer3](https://github.com/JamesRandall/AngularJS-OAuth2-IdentityServer3-Sample)
 
 The package is versioned using the [semantic versioning policy](http://semver.org).
 
-Feedback is very welcome. Please leave it in the [Issues](https://github.com/JamesRandall/AngularJS-OAuth2/issues) area or over on my [blog](https://www.azurefromthetrenches.com).
+Feedback is very welcome. Please leave it in the [issues](https://github.com/JamesRandall/AngularJS-OAuth2/issues) area or over on my [blog](https://www.azurefromthetrenches.com).
 
 ## Installing the Package
 
