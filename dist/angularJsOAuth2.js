@@ -1,13 +1,5 @@
 'use strict';
 
-// Move these to a directive
-//var authorizationUrl = 'https://localhost:44313/identity/connect/authorize';
-//var client_id = 'implicit';
-//var redirect_uri = 'http://localhost:37045/';
-//var response_type = "token";
-//var scope = "extracurricular";
-//var state = Date.now() + "" + Math.random();
-
 (function() {
 	function expired(token) {
 		return (token && token.expires_at && new Date(token.expires_at) < new Date());
