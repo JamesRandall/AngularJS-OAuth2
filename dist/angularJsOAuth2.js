@@ -111,7 +111,7 @@
 				if (!parsedFromHash || previousState == service.token.state) {
 					$rootScope.$broadcast('oauth2:authSuccess', service.token);
 					var oauthRedirectRoute = $window.sessionStorage.getItem('oauthRedirectRoute');
-					if (oauthRedirectRoute && oauthRedirectRoute != "null") {
+					if (typeof(oauthRedirectRoute) !== 'undefined' && oauthRedirectRoute != "null") {
 						$window.sessionStorage.setItem('oauthRedirectRoute', null);
 						$location.path(oauthRedirectRoute);
 					}
