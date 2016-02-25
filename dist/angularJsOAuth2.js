@@ -329,7 +329,7 @@
 
 		definition.link = function(scope, element, attrs) {
 			function compile() {
-				var tpl = '<p class="navbar-btn"><a class="{{buttonClass}}"><span href="#" ng-hide="signedIn" ng-click="signIn()" >{{signInText}}</span><span href="#" ng-show="signedIn" ng-click="signOut()">{{signOutText}}</span></a></p>';
+				var tpl = '<p class="navbar-btn"><a class="{{buttonClass}}" ng-click="signedIn ? signOut() : signIn()"><span href="#" ng-hide="signedIn">{{signInText}}</span><span href="#" ng-show="signedIn">{{signOutText}}</span></a></p>';
 				if (scope.template) {
 					$http.get(scope.template, { cache: $templateCache }).success(function(html) {
 			        element.html(html);
