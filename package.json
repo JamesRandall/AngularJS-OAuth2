@@ -1,6 +1,6 @@
 {
   "name": "angularjs-oauth2",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Bower and npm package for allowing an AngularJS application to authenticate with an OAuth 2 / Open ID Connect identity provider using the implicit flow.",
   "main": "dist/angularJsOAuth2.js",
   "scripts": {
