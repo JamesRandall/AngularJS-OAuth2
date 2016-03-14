@@ -11,9 +11,13 @@ Feedback is very welcome. Please leave it in the [Issues](https://github.com/Jam
 
 ## Installing the Package
 
-Use the Bower package manager to install the package into your AngularJS project:
+The preferred approach is to sse the Bower package manager to install the package into your AngularJS project:
 
     bower install --save angularjs-oauth2
+
+However you can also use npm:
+
+    npm install angularjs-oauth2 --save
 
 ## Basic Usage
 
