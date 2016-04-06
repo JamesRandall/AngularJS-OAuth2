@@ -351,7 +351,7 @@
 		    };
 			
 			//handle autoSignin & route changes (including uiRouter's state changes)
-			var isAutoSignin = scope.autoSignin && scope.autoSignin.toLower() === 'true';
+			var isAutoSignin = scope.autoSignin && scope.autoSignin.toLowerCase() === 'true';
 			function routeChangeHandler(event, nextRoute) {
 				if (isAutoSignin || (nextRoute.$$route && nextRoute.$$route.requireToken)) {
 					doAuth(event);
