@@ -28,15 +28,17 @@
   "homepage": "https://github.com/JamesRandall/AngularJS-OAuth2",
   "devDependencies": {
     "grunt": "^0.4.5",
-    "karma-script-launcher": "^0.1.0",
+    "grunt-cli": "^0.1.13",
+    "grunt-karma": "^0.11.1",
+    "jasmine-core": "^2.4.1",
+    "karma": "^0.12.37",
     "karma-chrome-launcher": "^0.2.0",
     "karma-jasmine": "^0.3.5",
     "karma-phantomjs-launcher": "^0.2.0",
-    "karma": "^0.12.37",
+    "karma-sauce-launcher": "~0.1.8",
+    "karma-script-launcher": "^0.1.0",
     "karma-story-reporter": "^0.3.1",
-    "grunt-karma": "^0.11.1",
-    "grunt-cli": "^0.1.13",
-    "karma-sauce-launcher": "~0.1.8"
+    "phantomjs": "^2.1.7"
   },
   "dependencies": {
     "angular-md5": "^0.1.10"
