@@ -1,25 +1,6 @@
 'use strict';
 
 (function() {
-    var tokenStorage = {
-        get: function($window) { return $window.sessionStorage.getItem('token') },
-        set: function(token, $window) { $window.sessionStorage.setItem('token', token); },
-        clear: function($window) { $window.sessionStorage.removeItem('token'); }
-    };
-    
-	function expired(token) {
-		return (token && token.expires_at && new Date(token.expires_at) < new Date());
-	};
-	function getSessionToken($window) {
-		var tokenString = tokenStorage.get($window);
-		var token = null;
-		if (tokenString && tokenString !== "null" ) {
-			token = JSON.parse(tokenString);
-			token.expires_at= new Date(token.expires_at);
-		}
-		return token;
-	}
-
 	angular.module('oauth2.accessToken', []).factory('AccessToken', ['$rootScope', '$location', '$window', function($rootScope, $location, $window) {
 		var service = {
 			token: null
@@ -38,7 +19,7 @@
 			var token = getTokenFromHashParams(hash);
 			if (token !== null) {
 				setExpiresAt(token);
-                tokenStorage.set(JSON.stringify(token), $window)	
+                service.tokenStorage.set(JSON.stringify(token), $window)
 			}
 			return token;
 		}
@@ -100,8 +81,8 @@
 				}
 			}
 			
-			if (service.token === null) {			
-				service.token = getSessionToken($window);
+			if (service.token === null) {
+				service.token = service.getSessionToken();
 				if (service.token === undefined) {
 					service.token = null;
 				}
@@ -132,21 +113,45 @@
 			return service.token;
 		};
 		service.destroy = function() {
-            tokenStorage.clear($window)
+            service.tokenStorage.clear($window)
 			$window.sessionStorage.setItem('token', null);
 			service.token = null;
+		};
+
+		service.isExpired = function() {
+			if(!this.token){
+				this.token = service.getSessionToken();
+			}
+
+			return (this.token && this.token.expires_at && new Date(this.token.expires_at) < new Date());
+		};
+
+		service.getSessionToken = function() {
+			var tokenString = service.tokenStorage.get($window);
+			var token = null;
+			if (tokenString && tokenString !== "null" ) {
+				token = JSON.parse(tokenString);
+				token.expires_at = new Date(token.expires_at);
+			}
+			return token;
+		};
+
+		service.tokenStorage = {
+			get: function($window) { return $window.sessionStorage.getItem('token') },
+			set: function(token, $window) { $window.sessionStorage.setItem('token', token); },
+			clear: function($window) { $window.sessionStorage.removeItem('token'); }
 		};
 
 		return service;
 	}]);
 
 	// Auth interceptor - if token is missing or has expired this broadcasts an authRequired event
-	angular.module('oauth2.interceptor', []).factory('OAuth2Interceptor', ['$rootScope', '$q', '$window',  function ($rootScope, $q, $window) {
+	angular.module('oauth2.interceptor', []).factory('OAuth2Interceptor', ['$rootScope', '$q', '$window', 'AccessToken',  function ($rootScope, $q, $window, accessToken) {
 		
 		var service = {
 			request: function(config) {
-				var token = getSessionToken($window);
-				if (expired(token)) {
+				var token = accessToken.getSessionToken();
+				if (accessToken.isExpired()) {
 					$rootScope.$broadcast('oauth2:authExpired', token);
 				}
 				else if (token) {
@@ -156,9 +161,9 @@
 	    		return config;
 	  		},
 	  		response: function(response) {
-	  			var token = getSessionToken($window);
+	  			var token = accessToken.getSessionToken();
 	  			if (response.status === 401) {
-	  				if (expired(token)) {
+	  				if (accessToken.isExpired()) {
 	  					$rootScope.$broadcast('oauth2:authExpired', token);
 	  				} else {
 	  					$rootScope.$broadcast('oauth2:unauthorized', token);
@@ -170,9 +175,9 @@
 	  			return response;
 	  		},
 	  		responseError: function(response) {
-	  			var token = getSessionToken($window);
+	  			var token = accessToken.getSessionToken();
 	  			if (response.status === 401) {
-	  				if (expired(token)) {
+	  				if (accessToken.isExpired()) {
 	  					$rootScope.$broadcast('oauth2:authExpired', token);
 	  				} else {
 	  					$rootScope.$broadcast('oauth2:unauthorized', token);
@@ -297,6 +302,9 @@
 			if (params.signOutAppendToken == 'true') {
 				service.appendSignoutToken = true;
 			}
+			if(params.tokenStorageHandler){
+				accessToken.tokenStorage = params.tokenStorageHandler;
+			}
 		};
 
 		return service;
@@ -351,7 +359,7 @@
 
 		    function routeChangeHandler(event, nextRoute) {
 		    	if (nextRoute.$$route && nextRoute.$$route.requireToken) {
-	                if (!accessToken.get() || expired(accessToken.get())) {
+	                if (!accessToken.get() || accessToken.isExpired()) {
 	                	event.preventDefault();
 	                	$window.sessionStorage.setItem('oauthRedirectRoute', $location.path());
 	                    endpoint.authorize();
@@ -361,9 +369,6 @@
 
 
 			function init() {
-                if (scope.tokenStorageHandler) {
-                    tokenStorage = scope.tokenStorageHandler
-                }
 				scope.buttonClass = scope.buttonClass || 'btn btn-primary';
 				scope.signInText = scope.signInText || 'Sign In';
 				scope.signOutText = scope.signOutText || 'Sign Out';
@@ -423,7 +428,7 @@
 			scope.signIn = function() {
 				$window.sessionStorage.setItem('oauthRedirectRoute', $location.path());
 				endpoint.authorize();
-			}
+			};
 
 			scope.signOut = function() {
 				var token = accessToken.get().id_token;
