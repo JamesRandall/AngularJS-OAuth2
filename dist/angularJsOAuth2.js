@@ -155,13 +155,31 @@
 	angular.module('oauth2.interceptor', []).factory('OAuth2Interceptor', ['$rootScope', '$q', '$window', 'AccessToken', function($rootScope, $q, $window, accessToken) {
 
 		var service = {
+			whitelist: [],
 			request: function(config) {
 				var token = accessToken.getSessionToken();
+
 				if (accessToken.isExpired()) {
 					$rootScope.$broadcast('oauth2:authExpired', token);
 				}
 				else if (token) {
-					config.headers.Authorization = 'Bearer ' + token.access_token;
+
+					if(service.whitelist.length > 0){
+						var isWhitelisted = false;
+						angular.forEach(service.whitelist, function(url){
+							if(config.url.search(new RegExp(url, 'gi')) > -1){
+								isWhitelisted = true;
+							}
+						});
+
+						if(isWhitelisted){
+							config.headers.Authorization = 'Bearer ' + token.access_token;
+						}
+					}
+					else{
+						config.headers.Authorization = 'Bearer ' + token.access_token;
+					}
+
 					return config;
 				}
 				return config;
@@ -305,7 +323,7 @@
 			service.silentTokenRedirectUrl = params.silentTokenRedirectUrl;
 			service.signOutRedirectUrl = params.signOutRedirectUrl;
 			service.state = params.state || generateState();
-			if (params.signOutAppendToken == 'true') {
+			if (params.signOutAppendToken || params.signOutAppendToken == 'true') {
 				service.appendSignoutToken = true;
 			}
 			if (params.tokenStorageHandler) {
