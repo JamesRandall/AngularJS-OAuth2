@@ -419,6 +419,11 @@
 				});
 				scope.signedIn = accessToken.set() !== null;
 				$rootScope.$on('$routeChangeStart', routeChangeHandler);
+				
+				$rootScope.$on("oauth2:signOut", function () {
+                    //allow signout to be triggered remotely
+				    scope.signOut();
+				});
 			}
 
 			scope.$watch('clientId', function(value) { init(); });
