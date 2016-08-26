@@ -388,7 +388,7 @@
 				});
 				scope.$on('oauth2:authSuccess', function() {
 					if (scope.silentTokenRedirectUrl.length > 0) {
-						if( $location.path().indexOf("/silent-renew") == 0 ) {
+						if( $location.absUrl().indexOf("/silent-renew") >= 0 ) {
 							// A 'child' frame has successfully authorised an access token.
 							if (window.top && window.parent && window !== window.top) {
 								var hash = hash || window.location.hash;
@@ -403,7 +403,7 @@
 					}
 				});
 				scope.$on('oauth2:authError', function() {
-					if( $location.path().indexOf("/silent-renew") == 0 && window.top && window.parent && window !== window.top) {
+					if( $location.absUrl().indexOf("/silent-renew") >= 0 && window.top && window.parent && window !== window.top) {
 						// A 'child' frame failed to authorize.
 						window.parent.postMessage("oauth2.silentRenewFailure", location.protocol + "//" + location.host);
 					}
