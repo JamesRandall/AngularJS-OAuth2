@@ -1,9 +1,9 @@
 {
-  "name": "AngularJS-OAuth2",
+  "name": "angularjs-oauth2",
   "version": "1.2.5",
   "homepage": "https://github.com/firstmac/AngularJS-OAuth2",
   "authors": [
-    "James Randall"
+    "Firstmac"
   ],
   "description": "Adds OAuth 2 authentication support to AngularJS",
   "keywords": [
