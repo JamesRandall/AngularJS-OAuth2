@@ -339,7 +339,7 @@
 			function compile() {
 				var tpl = '<p class="navbar-btn"><a class="{{buttonClass}}" ng-click="signedIn ? signOut() : signIn()"><span href="#" ng-hide="signedIn">{{signInText}}</span><span href="#" ng-show="signedIn">{{signOutText}}</span></a></p>';
 				if (scope.template) {
-					$http.get(scope.template, { cache: $templateCache }).success(function(html) {
+					$http.get(scope.template, { cache: $templateCache }).then(function(html) {
 			        element.html(html);
 			        $compile(element.contents())(scope);
 			      });
